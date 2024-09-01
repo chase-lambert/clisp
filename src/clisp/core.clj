@@ -20,16 +20,12 @@
 
 (def s "(first (list 1 (+ 2 3) 9))")
 
-(comment 
-  (num-balanced s) 
-  ,)
-
 (defn tokenize [s]
-  (remove empty?
-    (-> s
-        (string/replace "(" " ( ")
-        (string/replace ")" " ) ")
-        (string/split #" "))))
+  (-> s
+      (string/replace "(" " ( ")
+      (string/replace ")" " ) ")
+      (string/trim)
+      (string/split #"\s+")))
 
 (defn parse-tokens [])
 
