@@ -6,7 +6,9 @@
 
 (humane/activate!)
 
-(deftest add-test
-  (testing "testing add"
-    (is (= 4 (+ 1 1)))))
+(deftest parser-test
+  (testing "testing parser"
+    (let [s "(first (list 1 (+ 2 3) 9))"] 
+      (is (= (parse s)
+             ["first" ["list" 0 ["+" 2 3] 9]])))))
 
