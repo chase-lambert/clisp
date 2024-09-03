@@ -1,4 +1,4 @@
-{:paths   ["dev" "resources" "src" "test"]
+{:paths   ["dev" "resources" "src"]
 
  :aliases {:build {:deps {io.github.clojure/tools.build
                           {:git/tag "v0.8.3" :git/sha "0d20256"}}
@@ -11,11 +11,13 @@
                                 "--middleware" "[cider.nrepl/cider-middleware]"
                                 "--interactive"]}
 
-           :test {:extra-deps {pjstadig/humane-test-output {:mvn/version "0.11.0"}
-                               io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
-                  :main-opts ["-m" "cognitect.test-runner"]
-                  :exec-fn cognitect.test-runner.api/test}
+           :test {:extra-paths ["test"]
+                  :extra-deps  {pjstadig/humane-test-output {:mvn/version "0.11.0"}
+                                io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                  :main-opts   ["-m" "cognitect.test-runner"]
+                  :exec-fn     cognitect.test-runner.api/test}
           
-           :test-refresh {:extra-deps {com.jakemccrary/test-refresh {:mvn/version "0.25.0"}
-                                       pjstadig/humane-test-output {:mvn/version "0.11.0"}}
-                          :main-opts ["-m" "com.jakemccrary.test-refresh"]}}}
+           :test-refresh {:extra-paths ["test"]
+                          :extra-deps  {com.jakemccrary/test-refresh {:mvn/version "0.25.0"}
+                                        pjstadig/humane-test-output {:mvn/version "0.11.0"}}
+                          :main-opts   ["-m" "com.jakemccrary.test-refresh"]}}}
