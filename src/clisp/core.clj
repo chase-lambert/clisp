@@ -33,7 +33,7 @@
                 [(conj parsed-exprs expr) (rest new-rem-tokens)]
                 (recur (conj parsed-exprs expr) new-rem-tokens))))
       
-      ")" [nil remaining]
+      ")" (throw (Exception. "unexpected ')'; no malformed code please"))
     
       [(atomize token) remaining])))
 
