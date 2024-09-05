@@ -68,3 +68,13 @@
   (testing "testing complex lambda"
     (let [s "((fn (a) a) 1)"]
       (is (= 1 (ceval (parse s)))))))
+
+(deftest eval-lamba-with-lambda-with-param-test
+  (testing "testing complex lambda"
+    (let [s "((fn (a) ((fn () a))) 1)"]
+      (is (= 1 (ceval (parse s)))))))
+
+(deftest eval-lamba-with-lambda-with-param-test-dynamic
+  (testing "testing complex lambda"
+    (let [s "((fn (a b) (b)) 1 (fn () a))"]
+      (is (= 1 (ceval (parse s)))))))

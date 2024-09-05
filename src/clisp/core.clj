@@ -54,7 +54,7 @@
        first))      ;; ["first" ["list" 1 ["+" 2 3] 9]]
 
 
-(defn ceval 
+(defn ceval
   ([expr] (ceval expr {}))
   ([expr bindings] (if (vector? expr)
                      (let [[first-expr & args] expr]
@@ -65,13 +65,16 @@
                                   (ceval else bindings)))
 
                          "+" (apply + (map #(ceval % bindings) args))
-        
+
                          "fn" (let [[params body] args]
-                                {:params params
-                                 :body   body})
-        
-                         (let [{:keys [params body]} (ceval first-expr bindings)
-                               new-bindings (zipmap params (map #(ceval % bindings) args))] 
+                                {:params   params
+                                 :body     body
+                                 :bindings bindings})
+
+                         (let [{:keys [params body] :as f} (ceval first-expr bindings)
+                               new-bindings          (-> (:bindings f)
+                                                       (into bindings)
+                                                       (into (zipmap params (map #(ceval % bindings) args))))]
                            (ceval body new-bindings))))
 
                      (if (string? expr)
