@@ -1,7 +1,6 @@
 (ns clisp.core
   (:require 
    [clojure.string :as str])
-  ;;  [clojure.edn :as edn])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -21,6 +20,7 @@
   (or (parse-long token) 
       (parse-double token) 
       (str token)))
+      ;; (symbol token)))
 
 (defn parse-tokens [tokens]
   {:pre (seq (first tokens))}
