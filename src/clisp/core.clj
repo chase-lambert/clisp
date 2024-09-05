@@ -46,6 +46,7 @@
 (comment
   (def s "(first (list 1 (+ 2 3) 9))") 
   (parse s)
+  (parse-tokens "")
   ,)
 
 (defn -main [s]

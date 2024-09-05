@@ -19,3 +19,8 @@
             Exception 
             #"unexpected '\)'; no malformed code please" 
             (parse s))))))
+
+(deftest empty-input-parse-tokens-test
+  (testing "testing empty code being sent to parse-tokens function"
+    (let [s ""] 
+      (is (thrown? AssertionError (parse-tokens s))))))
