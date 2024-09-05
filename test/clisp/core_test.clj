@@ -20,6 +20,11 @@
             #"unexpected '\)'; no malformed code please"
             (parse s))))))
 
+(deftest empty-list-input-test
+  (testing "passing an empty list to parse-tokens"
+    (let [s "()"]
+      (is (= [] (parse s))))))
+
 (deftest empty-input-parse-tokens-test
   (testing "testing empty code being sent to parse-tokens function"
     (let [s ""]
@@ -53,3 +58,13 @@
     (let [s "(if false 2 3)"]
       (is (= 3 (ceval (parse s)))
         "should evaluate else expression"))))
+
+(deftest eval-lambda-test
+  (testing "testing simple lamda"
+    (let [s "((fn () 1))"]
+      (is (= 1 (ceval (parse s)))))))
+
+(deftest eval-lamba-with-param-test
+  (testing "testing complex lambda"
+    (let [s "((fn (a) a) 1)"]
+      (is (= 1 (ceval (parse s)))))))

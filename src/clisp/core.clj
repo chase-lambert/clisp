@@ -25,20 +25,27 @@
         (str token))))
       ;; (symbol token)))
 
+(declare parse-list)
+
 (defn parse-tokens [tokens]
   {:pre (seq (first tokens))}
   (let [[token & remaining] tokens]
     (case token
-      "(" (loop [parsed-exprs []
-                 rem-tokens remaining]
-            (let [[expr new-rem-tokens] (parse-tokens rem-tokens)]
-              (if (= ")" (first new-rem-tokens))
-                [(conj parsed-exprs expr) (rest new-rem-tokens)]
-                (recur (conj parsed-exprs expr) new-rem-tokens))))
+      "(" (parse-list remaining)
 
       ")" (throw (Exception. "unexpected ')'; no malformed code please"))
 
       [(atomize token) remaining])))
+
+(defn parse-list [tokens]
+  (loop [parsed-exprs []
+         rem-tokens tokens]
+    (case (first rem-tokens)
+
+      ")" [parsed-exprs (next rem-tokens)]
+
+      (let [[expr rem-tokens] (parse-tokens rem-tokens)]
+        (recur (conj parsed-exprs expr) rem-tokens)))))
 
 (defn parse [s]
   (->> s            ;; "(first (list 1 (+ 2 3) 9))"
@@ -46,22 +53,36 @@
        parse-tokens ;; [["first" ["list" 1 ["+" 2 3] 9]] ()]
        first))      ;; ["first" ["list" 1 ["+" 2 3] 9]]
 
-(defn ceval [expr]
-  (if (vector? expr)
-    (let [[first-expr & args] expr]
-      (condp = first-expr
-        "if" (let [[condition then else] args]
-               (if (ceval condition)
-                 (ceval then)
-                 (ceval else)))
-        "+" (apply + (map ceval args))))
 
-    expr))
+(defn ceval 
+  ([expr] (ceval expr {}))
+  ([expr bindings] (if (vector? expr)
+                     (let [[first-expr & args] expr]
+                       (condp = first-expr
+                         "if" (let [[condition then else] args]
+                                (if (ceval condition bindings)
+                                  (ceval then bindings)
+                                  (ceval else bindings)))
+
+                         "+" (apply + (map #(ceval % bindings) args))
+        
+                         "fn" (let [[params body] args]
+                                {:params params
+                                 :body   body})
+        
+                         (let [{:keys [params body]} (ceval first-expr bindings)
+                               new-bindings (zipmap params (map #(ceval % bindings) args))] 
+                           (ceval body new-bindings))))
+
+                     (if (string? expr)
+                       (get bindings expr)
+                       expr))))
 
 (comment
   (def s "(first (list 1 (+ 2 3) 9))")
   (parse s)
   (parse-tokens "")
+  (parse "()")
   ,)
 
 (defn -main [s]
