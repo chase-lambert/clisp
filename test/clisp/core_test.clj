@@ -24,3 +24,18 @@
   (testing "testing empty code being sent to parse-tokens function"
     (let [s ""] 
       (is (thrown? AssertionError (parse-tokens s))))))
+
+(deftest eval-atom-test
+  (testing "testing atom"
+    (let [s "1"]
+      (is (= 1 (ceval (parse s)))))))
+  
+(deftest eval-simple-expression-test
+  (testing "testing simple expression"
+    (let [s "(+ 1 2)"]
+      (is (= 3 (ceval (parse s)))))))
+
+(deftest eval-complex-expression-test
+  (testing "testing complex expression"
+    (let [s "(+ 1 (+ 2 3))"]
+      (is (= 6 (ceval (parse s)))))))

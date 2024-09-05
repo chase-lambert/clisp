@@ -7,6 +7,7 @@
 
 (comment
   (def s "(first (list 1 (+ 2 3) 9))") 
+  (tokenize s) ;; ["(" "first" "(" "list" "1" "(" "+" "2" "3" ")" "9" ")" ")"]
   ,)
 
 (defn tokenize [s]
@@ -42,6 +43,14 @@
        tokenize     ;; ["(" "first" "(" "list" "1" "(" "+" "2" "3" ")" "9" ")" ")"]
        parse-tokens ;; [["first" ["list" 1 ["+" 2 3] 9]] ()]
        first))      ;; ["first" ["list" 1 ["+" 2 3] 9]]
+
+(defn ceval [expr]
+  (if (vector? expr)
+    (let [[first-expr & args] expr]
+      (condp = first-expr
+        "+" (apply + (map ceval args)))) 
+        
+    expr))
 
 (comment
   (def s "(first (list 1 (+ 2 3) 9))") 
