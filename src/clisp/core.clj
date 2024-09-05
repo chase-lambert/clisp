@@ -1,12 +1,12 @@
 (ns clisp.core
-  (:require 
+  (:require
    [clojure.string :as str])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
 
 (comment
-  (def s "(first (list 1 (+ 2 3) 9))") 
+  (def s "(first (list 1 (+ 2 3) 9))")
   (tokenize s) ;; ["(" "first" "(" "list" "1" "(" "+" "2" "3" ")" "9" ")" ")"]
   ,)
 
@@ -18,9 +18,11 @@
       (str/split #"\s+")))
 
 (defn atomize [token]
-  (or (parse-long token) 
-      (parse-double token) 
-      (str token)))
+  (or (parse-long token)
+      (parse-double token)
+      (if (= token "false")
+        false
+        (str token))))
       ;; (symbol token)))
 
 (defn parse-tokens [tokens]
@@ -33,9 +35,9 @@
               (if (= ")" (first new-rem-tokens))
                 [(conj parsed-exprs expr) (rest new-rem-tokens)]
                 (recur (conj parsed-exprs expr) new-rem-tokens))))
-      
+
       ")" (throw (Exception. "unexpected ')'; no malformed code please"))
-    
+
       [(atomize token) remaining])))
 
 (defn parse [s]
@@ -48,16 +50,19 @@
   (if (vector? expr)
     (let [[first-expr & args] expr]
       (condp = first-expr
-        "+" (apply + (map ceval args)))) 
-        
+        "if" (let [[condition then else] args]
+               (if (ceval condition)
+                 (ceval then)
+                 (ceval else)))
+        "+" (apply + (map ceval args))))
+
     expr))
 
 (comment
-  (def s "(first (list 1 (+ 2 3) 9))") 
+  (def s "(first (list 1 (+ 2 3) 9))")
   (parse s)
   (parse-tokens "")
   ,)
 
 (defn -main [s]
-  (println (parse s))) 
-
+  (println (parse s)))
