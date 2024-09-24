@@ -3,13 +3,6 @@
    [clojure.string :as str])
   (:gen-class))
 
-(set! *warn-on-reflection* true)
-
-(comment
-  (def s "(first (list 1 (+ 2 3) 9))")
-  (tokenize s) ;; ["(" "first" "(" "list" "1" "(" "+" "2" "3" ")" "9" ")" ")"]
-  ,)
-
 (defn tokenize [s]
   (-> s
       (str/replace "(" " ( ")
@@ -23,7 +16,6 @@
       (if (= token "false")
         false
         (str token))))
-      ;; (symbol token)))
 
 (declare parse-list)
 
@@ -48,11 +40,10 @@
         (recur (conj parsed-exprs expr) rem-tokens)))))
 
 (defn parse [s]
-  (->> s            ;; "(first (list 1 (+ 2 3) 9))"
-       tokenize     ;; ["(" "first" "(" "list" "1" "(" "+" "2" "3" ")" "9" ")" ")"]
-       parse-tokens ;; [["first" ["list" 1 ["+" 2 3] 9]] ()]
-       first))      ;; ["first" ["list" 1 ["+" 2 3] 9]]
-
+  (->> s 
+       tokenize
+       parse-tokens
+       first))
 
 (defn ceval
   ([expr] (ceval expr {}))
@@ -81,6 +72,31 @@
                        (get bindings expr)
                        expr))))
 
+(defn repl []
+  (println "Welcome to Clisp REPL. Type 'exit' to quit.")
+  (flush)
+  (loop []
+    (print "clisp> ")
+    (flush)
+    (let [input (read-line)]
+      (if (= input "exit")
+        (do
+          (println "Goodbye!")
+          (flush))
+        (do
+          (try
+            (let [parsed (parse input)
+                  result (ceval parsed)]
+              (println result)
+              (flush))
+            (catch Exception e
+              (println "Error:" (.getMessage e))
+              (flush)))
+          (recur))))))
+
+(defn -main []
+  (repl))
+
 (comment
   (def s "(first (list 1 (+ 2 3) 9))")
   (parse s)
@@ -88,5 +104,3 @@
   (parse "()")
   ,)
 
-(defn -main [s]
-  (println (parse s)))
