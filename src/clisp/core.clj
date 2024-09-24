@@ -79,10 +79,12 @@
     (print "clisp> ")
     (flush)
     (let [input (read-line)]
-      (if (= input "exit")
-        (do
-          (println "Goodbye!")
+      (if (or (nil? input) ;; allows for Ctrl-D exit
+              (= "exit" input)) 
+        (do 
+          (println "\nGoodbye!")
           (flush))
+
         (do
           (try
             (let [parsed (parse input)
